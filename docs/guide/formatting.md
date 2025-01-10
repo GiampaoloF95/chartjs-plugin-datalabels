@@ -104,3 +104,13 @@ Supported values for `textAlign`:
 - `'end'`: the text is right-aligned
 - `'left'`: alias of `'start'`
 - `'right'`: alias of `'end'`
+
+## Text style
+
+Labels style can be modified to be bold or italic using Markdown syntax **bold** or *italic*.
+
+```javascript
+formatter: function(value) {
+  return 'normal text **bold text** *italic text*';
+}
+```

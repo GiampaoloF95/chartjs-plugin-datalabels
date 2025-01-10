@@ -154,16 +154,14 @@ function textGeometry(rect, align, font) {
     y: y
   };
 }
-
-function drawTextLine(ctx, text, cfg) {
+function drawTextChunk(ctx, chunk, cfg, baseFont, x, y, w) {
   var shadow = ctx.shadowBlur;
   var stroked = cfg.stroked;
-  var x = rasterize(cfg.x);
-  var y = rasterize(cfg.y);
-  var w = rasterize(cfg.w);
+
+  ctx.font = `${chunk.style} ${baseFont}`;
 
   if (stroked) {
-    ctx.strokeText(text, x, y, w);
+    ctx.strokeText(chunk.text, x, y, w);
   }
 
   if (cfg.filled) {
@@ -172,13 +170,28 @@ function drawTextLine(ctx, text, cfg) {
       // if the text is stroked, remove the shadow for the text fill.
       ctx.shadowBlur = 0;
     }
-
-    ctx.fillText(text, x, y, w);
+    ctx.fillText(chunk.text, x, y, w);
 
     if (shadow && stroked) {
       ctx.shadowBlur = shadow;
     }
   }
+}
+
+function drawTextLine(ctx, text, cfg) {
+  var x = rasterize(cfg.x);
+  var y = rasterize(cfg.y);
+  var w = rasterize(cfg.w);
+
+  var chunks = utils.toTextChunks(text);
+  var baseFont = ctx.font;
+  for (var chunk of chunks) {
+    drawTextChunk(ctx, chunk, cfg, baseFont, x, y, w);
+    // move text position for each chunk
+    x = x + Math.floor(ctx.measureText(chunk.text).width);
+  }
+  // reset font for next line
+  ctx.font = baseFont;
 }
 
 function drawText(ctx, lines, rect, model) {

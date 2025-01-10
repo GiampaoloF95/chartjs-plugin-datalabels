@@ -36,6 +36,60 @@ describe('utils.js', function() {
     });
   });
 
+  describe('toTextChunks', function() {
+    var toTextChunks = utils.toTextChunks;
+
+    it ('text should be a string', function() {
+      expect(toTextChunks(123)).toThrow(new TypeError('Text must be a string'));
+    });
+
+    it('should create one chunk with no format', function() {
+      expect(toTextChunks('test')).toEqual([{
+        text: 'test',
+        start: 0,
+        end: 'test'.length,
+        style: 'normal',
+      }]);
+    });
+
+    it('should create chunks with format', function() {
+      expect(toTextChunks('test **bold** *italics* normal')).toEqual(
+        [
+          {
+            text: 'test ',
+            start: 0,
+            end: 5,
+            style: 'normal'
+          },
+          {
+            text: 'bold',
+            start: 5,
+            end: 13,
+            style: 'bold'
+          },
+          {
+            text: ' ',
+            start: 13,
+            end: 14,
+            style: 'normal'
+          },
+          {
+            text: 'italics',
+            start: 14,
+            end: 23,
+            style: 'italic'
+          },
+          {
+            text: ' normal',
+            start: 23,
+            end: 30,
+            style: 'normal'
+          }
+        ]
+      );
+    });
+  });
+
   describe('arrayDiff', function() {
     var arrayDiff = utils.arrayDiff;
 
