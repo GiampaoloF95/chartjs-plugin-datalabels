@@ -154,14 +154,14 @@ function textGeometry(rect, align, font) {
     y: y
   };
 }
-function drawTextChunk(ctx, chunk, cfg, baseFont, x, y, w) {
+function drawTextChunk(ctx, chunk, cfg, baseFont, axis) {
   var shadow = ctx.shadowBlur;
   var stroked = cfg.stroked;
 
   ctx.font = `${chunk.style} ${baseFont}`;
 
   if (stroked) {
-    ctx.strokeText(chunk.text, x, y, w);
+    ctx.strokeText(chunk.text, axis.x, axis.y, axis.w);
   }
 
   if (cfg.filled) {
@@ -170,7 +170,7 @@ function drawTextChunk(ctx, chunk, cfg, baseFont, x, y, w) {
       // if the text is stroked, remove the shadow for the text fill.
       ctx.shadowBlur = 0;
     }
-    ctx.fillText(chunk.text, x, y, w);
+    ctx.fillText(chunk.text, axis.x, axis.y, axis.w);
 
     if (shadow && stroked) {
       ctx.shadowBlur = shadow;
@@ -179,16 +179,18 @@ function drawTextChunk(ctx, chunk, cfg, baseFont, x, y, w) {
 }
 
 function drawTextLine(ctx, text, cfg) {
-  var x = rasterize(cfg.x);
-  var y = rasterize(cfg.y);
-  var w = rasterize(cfg.w);
+  var axis = {
+    x: rasterize(cfg.x),
+    y: rasterize(cfg.y),
+    w: rasterize(cfg.w),
+  };
 
   var chunks = utils.toTextChunks(text);
   var baseFont = ctx.font;
   for (var chunk of chunks) {
-    drawTextChunk(ctx, chunk, cfg, baseFont, x, y, w);
+    drawTextChunk(ctx, chunk, cfg, baseFont, axis);
     // move text position for each chunk
-    x = x + Math.floor(ctx.measureText(chunk.text).width);
+    axis.x = axis.x + Math.floor(ctx.measureText(chunk.text).width);
   }
   // reset font for next line
   ctx.font = baseFont;

@@ -43,16 +43,16 @@ var utils = {
     if (typeof text !== 'string') {
       throw new TypeError('Text must be a string');
     }
-  
+
     var chunks = [];
     var preIndex = 0;
 
     // Looks for **bold text** or *italic text*
     var regex = /\*{2}(?<bold>.+?)\*{2}|\*(?<italic>.+?)\*/gm;
-  
+
     // Text is split into chunks, for every match found
     text.matchAll(regex).forEach(elem => {
-      var styledText = elem.groups['bold'] ?? elem.groups['italic'] ?? "";
+      var styledText = elem.groups.bold ?? elem.groups.italic ?? '';
       // Every match two chunks are created.
       // The first chuck contains the unstyled text preceding the styled text.
       // If the text starts styled the first chunk is empty.
@@ -67,25 +67,25 @@ var utils = {
           text: styledText,
           start: elem.index,
           end: elem.index + elem[0].length,
-          style: elem.groups['bold'] ? 'bold' : 'italic',
+          style: elem.groups.bold ? 'bold' : 'italic',
         }
       );
       // Move index to end of the styled word to start with the next chunk.
       preIndex = elem.index + elem[0].length;
     });
-  
+
     // Add a chuck for any non styled text remaing after last chuck is added.
-    if(chunks.length && chunks.at(-1).end !== text.length) {
+    if (chunks.length && chunks.at(-1).end !== text.length) {
       chunks.push({
-          text: text.substring(chunks.at(-1).end,),
-          start: chunks.at(-1).end,
-          end: text.length,
-          style: 'normal',
-        });
+        text: text.substring(chunks.at(-1).end),
+        start: chunks.at(-1).end,
+        end: text.length,
+        style: 'normal',
+      });
     }
 
     // If no style is detected just created a chuck containing the whole text
-    if(!chunks.length && text) {
+    if (!chunks.length && text) {
       chunks.push({
         text: text,
         start: 0,
